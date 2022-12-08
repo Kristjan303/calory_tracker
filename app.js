@@ -30,6 +30,15 @@ const StorageCtrl = (function(){
                 items[id]=newItem
                 localStorage.setItem("items", JSON.stringify(items))
             }
+        },
+        delItemFromLS: function(id){
+            if(localStorage.getItem("items") === null){
+            } else {
+                let items;
+                items = JSON.parse(localStorage.getItem("items"))
+                items.splice(id,1)
+                localStorage.setItem("items", JSON.stringify(items))
+            }
         }
     }})();
 const ItemCtrl = (function(){
@@ -38,6 +47,7 @@ const ItemCtrl = (function(){
         this.name = name
         this.calories = calories
     }
+    // deleteItem: (deleteItem)
 
     const data = {
         items: [
@@ -94,8 +104,13 @@ const UICtrl = (function(){
         itemCaloriesInput: "#item-calories",
         addBtn: ".add-btn",
         totalCalories: ".total-calories",
-        updateBtn: ".edit-btn"
+        updateBtn: ".edit-btn",
+        deleteBtn: ".delete-btn",
+        backBtn: ".back-btn",
+        clearBtn: ".clear-btn"
     }
+
+
     return {
         populateItemList: function(items){
             let html= "";
@@ -135,15 +150,33 @@ const UICtrl = (function(){
             document.querySelector(UISelectors.totalCalories).textContent = totalCalories
         },
         showupdateBtn: function (){
-            document.querySelector(UISelectors.updateBtn).style.display= "block"
+            document.querySelector(UISelectors.updateBtn).style.display= "inline"
             document.querySelector(UISelectors.addBtn).style.display= "none"
         },
         hideupdateBtn: function (){
             document.querySelector(UISelectors.updateBtn).style.display= "none"
-            document.querySelector(UISelectors.addBtn).style.display= "block"
-        }
-    }
-})();
+            document.querySelector(UISelectors.addBtn).style.display= "inline"
+        },
+        showDeleteBtn: function (){
+            document.querySelector(UISelectors.deleteBtn).style.display = "inline"
+            document.querySelector(UISelectors.addBtn).style.display = "none"
+        },
+        hideDeleteBtn: function (){
+            document.querySelector(UISelectors.deleteBtn).style.display = "none"
+            document.querySelector(UISelectors.addBtn).style.display = "inline"
+        },
+        showBackBtn: function (){
+            document.querySelector(UISelectors.backBtn).style.display = "inline"
+            document.querySelector(UISelectors.addBtn).style.display = "none"
+        },
+        hideBackBtn: function (){
+            document.querySelector(UISelectors.backBtn).style.display = "none"
+            document.querySelector(UISelectors.addBtn).style.display = "inline"
+        },
+
+
+
+}})();
 const App = (function(ItemCtrl,StorageCtrl,UICtrl){
     const loadEventListeners = function(){
         const UISelectors = UICtrl.getSelectors()
@@ -151,7 +184,15 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
         document.querySelector("ul").addEventListener("click", itemMealUpdate);
         document.querySelector(UISelectors.updateBtn).addEventListener("click", mealUpdate);
         document.addEventListener("DOMContentLoaded", getItemsFromLS)
+        document.querySelector("ul").addEventListener("click", itemMealDelete)
+        document.querySelector(UISelectors.deleteBtn).addEventListener("click", mealDelete)
+        document.querySelector("ul").addEventListener("click", itemMealClean)
     }
+    // const itemDeleteSubmit = (event) ==> {
+    //     const deleteItem = ItemCtrl
+    // }
+
+
     const itemAddSubmit = function(event) {
         const input = UICtrl.getItemInput()
         if (input.name !== '' && input.calories !== '') {
@@ -170,7 +211,7 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
         if(event.target.className === "edit-item fa fa-pencil"){
             if (document.querySelector(UISelectors.updateBtn).style.display === 'none'){
                 UICtrl.showupdateBtn()
-            } else {
+            }else {
                 UICtrl.hideupdateBtn()
             }
             // StorageCtrl.storeItem(newItem)
@@ -191,6 +232,27 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
             newItem.id = newID
             StorageCtrl.changeItemFromLS(newID, newItem)
         }
+    }
+    const itemMealDelete = function (){
+        const UISelectors = UICtrl.getSelectors()
+        if (event.target.className === "edit-item fa fa-pencil"){
+            if (document.querySelector(UISelectors.deleteBtn).style.display === "none"){
+                UICtrl.showDeleteBtn()
+            } else {
+                UICtrl.hideDeleteBtn()
+            }
+        }
+    }
+    const itemMealClean = function () {
+        localStorage.removeItem('items')
+    }
+    const mealDelete = function (){
+        const list = document.querySelector("#item-list")
+        const UISelectors = UICtrl.getSelectors()
+        var nodes = Array.from(list.children)
+        delID = nodes.indexOf(document.querySelector("#item-update"))
+        StorageCtrl.delItemFromLS(delID)
+        list.removeChild(list.children[delID])
     }
     const getItemsFromLS = function(){
         const items = StorageCtrl.getItemsFromLS
