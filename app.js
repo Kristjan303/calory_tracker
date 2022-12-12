@@ -186,7 +186,10 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
         document.addEventListener("DOMContentLoaded", getItemsFromLS)
         document.querySelector("ul").addEventListener("click", itemMealDelete)
         document.querySelector(UISelectors.deleteBtn).addEventListener("click", mealDelete)
-        document.querySelector("ul").addEventListener("click", itemMealClean)
+        document.querySelector(UISelectors.backBtn).addEventListener("click", mealBack)
+        document.querySelector(UISelectors.clearBtn).addEventListener("click", itemMealClean)
+        document.querySelector(UISelectors.backBtn).addEventListener("click", itemMealBack)
+        document.querySelector("ul").addEventListener("click", itemMealBack);
     }
     // const itemDeleteSubmit = (event) ==> {
     //     const deleteItem = ItemCtrl
@@ -233,6 +236,16 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
             StorageCtrl.changeItemFromLS(newID, newItem)
         }
     }
+
+    const itemMealBack = function(event){
+        const UISelectors = UICtrl.getSelectors()
+        if(event.target.className === "edit-item fa fa-pencil"){
+            if (document.querySelector(UISelectors.backBtn).style.display === 'none'){
+                UICtrl.showBackBtn()
+            }else {
+                UICtrl.hideBackBtn()
+            }
+        }}
     const itemMealDelete = function (){
         const UISelectors = UICtrl.getSelectors()
         if (event.target.className === "edit-item fa fa-pencil"){
@@ -244,8 +257,11 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
         }
     }
     const itemMealClean = function () {
-        localStorage.removeItem('items')
-    }
+        if (confirm('Are you sure to delete these meals? PS! refresh ;)')){
+            localStorage.removeItem('items')
+    }}
+
+
     const mealDelete = function (){
         const list = document.querySelector("#item-list")
         const UISelectors = UICtrl.getSelectors()
@@ -254,6 +270,13 @@ const App = (function(ItemCtrl,StorageCtrl,UICtrl){
         StorageCtrl.delItemFromLS(delID)
         list.removeChild(list.children[delID])
     }
+    const mealBack = function (){
+            console.log("re")
+            UICtrl.hideBackBtn()
+            UICtrl.hideDeleteBtn()
+            UICtrl.hideupdateBtn()
+    }
+
     const getItemsFromLS = function(){
         const items = StorageCtrl.getItemsFromLS
         items.forEach(function(item){
